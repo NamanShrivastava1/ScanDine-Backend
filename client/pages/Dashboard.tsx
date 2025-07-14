@@ -982,6 +982,46 @@ export default function Dashboard() {
                 </form>
               </DialogContent>
             </Dialog>
+
+            {/* Delete Confirmation Modal */}
+            <AlertDialog
+              open={isDeleteModalOpen}
+              onOpenChange={setIsDeleteModalOpen}
+            >
+              <AlertDialogContent className="sm:max-w-md bg-card border-border shadow-xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl font-bold text-destructive">
+                    Are you sure you want to delete this item?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-base leading-relaxed text-muted-foreground">
+                    This action cannot be undone. The dish "{itemToDelete?.name}
+                    " will be permanently removed from your menu.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="gap-3">
+                  <AlertDialogCancel
+                    className="flex-1 border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                    disabled={isDeletingItem}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteItem}
+                    disabled={isDeletingItem}
+                    className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors duration-300 hover:brightness-110"
+                  >
+                    {isDeletingItem ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Deleting...
+                      </>
+                    ) : (
+                      "Yes, Delete"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </TabsContent>
 
           {/* QR Code Tab */}
