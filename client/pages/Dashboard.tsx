@@ -789,7 +789,20 @@ export default function Dashboard() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          openDeleteModal({
+                            id: 2,
+                            name: "Croissant",
+                            category: "Breakfast",
+                            description: "Fresh baked daily",
+                            price: 2.75,
+                            popular: false,
+                          })
+                        }
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
