@@ -333,7 +333,7 @@ export default function Dashboard() {
 
       if (response.ok || true) {
         // Always succeed for demo
-        setIsDeleteModalOpen(false);
+        setIsDeleteItemModalOpen(false);
         setItemToDelete(null);
         alert(`"${itemToDelete.name}" has been deleted successfully!`);
       } else {
@@ -345,7 +345,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error deleting menu item:", error);
       // For demo purposes, still show success
-      setIsDeleteModalOpen(false);
+      setIsDeleteItemModalOpen(false);
       setItemToDelete(null);
       alert(`"${itemToDelete.name}" has been deleted successfully!`);
     } finally {
