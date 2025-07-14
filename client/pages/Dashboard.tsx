@@ -90,6 +90,11 @@ export default function Dashboard() {
   // Selected item for editing
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
+  // Delete confirmation state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<any>(null);
+  const [isDeletingItem, setIsDeletingItem] = useState(false);
+
   const categories = [
     "Starters",
     "Main Course",
