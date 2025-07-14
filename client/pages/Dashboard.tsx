@@ -985,8 +985,8 @@ export default function Dashboard() {
 
             {/* Delete Confirmation Modal */}
             <AlertDialog
-              open={isDeleteModalOpen}
-              onOpenChange={setIsDeleteModalOpen}
+              open={isDeleteItemModalOpen}
+              onOpenChange={setIsDeleteItemModalOpen}
             >
               <AlertDialogContent className="sm:max-w-md bg-card border-border shadow-xl">
                 <AlertDialogHeader>
