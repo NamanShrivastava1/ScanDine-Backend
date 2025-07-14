@@ -739,12 +739,12 @@ export default function Dashboard() {
 
             {/* Edit Item Modal */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-              <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-slate-800 border-slate-700">
+              <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-card border-border shadow-lg transition-colors duration-300">
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-bold text-white">
+                  <DialogTitle className="text-xl font-bold text-foreground">
                     Edit Menu Item
                   </DialogTitle>
-                  <DialogDescription className="text-slate-300">
+                  <DialogDescription className="text-muted-foreground">
                     Update the details of your menu item below.
                   </DialogDescription>
                 </DialogHeader>
@@ -754,7 +754,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="editDishName"
-                      className="text-sm font-medium text-white"
+                      className="text-sm font-medium text-foreground"
                     >
                       Dish Name *
                     </Label>
@@ -765,12 +765,14 @@ export default function Dashboard() {
                       placeholder="e.g., Cappuccino, Caesar Salad"
                       value={editFormData.dishName}
                       onChange={handleEditInputChange}
-                      className={`h-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 ${
-                        errors.dishName ? "border-red-500" : ""
+                      className={`h-10 bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110 ${
+                        errors.dishName ? "border-destructive" : ""
                       }`}
                     />
                     {errors.dishName && (
-                      <p className="text-xs text-red-400">{errors.dishName}</p>
+                      <p className="text-xs text-destructive">
+                        {errors.dishName}
+                      </p>
                     )}
                   </div>
 
@@ -778,7 +780,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="editCategory"
-                      className="text-sm font-medium text-white"
+                      className="text-sm font-medium text-foreground"
                     >
                       Category *
                     </Label>
@@ -787,18 +789,18 @@ export default function Dashboard() {
                       onValueChange={handleEditCategoryChange}
                     >
                       <SelectTrigger
-                        className={`h-10 bg-slate-700 border-slate-600 text-white ${
-                          errors.category ? "border-red-500" : ""
+                        className={`h-10 bg-background border-border text-foreground transition-colors duration-300 hover:brightness-110 ${
+                          errors.category ? "border-destructive" : ""
                         }`}
                       >
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
-                      <SelectContent className="bg-slate-700 border-slate-600">
+                      <SelectContent className="bg-card border-border">
                         {categories.map((category) => (
                           <SelectItem
                             key={category}
                             value={category}
-                            className="text-white hover:bg-slate-600"
+                            className="text-foreground hover:bg-accent hover:text-accent-foreground"
                           >
                             {category}
                           </SelectItem>
@@ -806,7 +808,9 @@ export default function Dashboard() {
                       </SelectContent>
                     </Select>
                     {errors.category && (
-                      <p className="text-xs text-red-400">{errors.category}</p>
+                      <p className="text-xs text-destructive">
+                        {errors.category}
+                      </p>
                     )}
                   </div>
 
@@ -814,7 +818,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="editDescription"
-                      className="text-sm font-medium text-white"
+                      className="text-sm font-medium text-foreground"
                     >
                       Description
                     </Label>
@@ -824,24 +828,24 @@ export default function Dashboard() {
                       placeholder="Describe your dish..."
                       value={editFormData.description}
                       onChange={handleEditInputChange}
-                      className="min-h-[80px] resize-none bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                      className="min-h-[80px] resize-none bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110"
                     />
                   </div>
 
                   {/* Popular Toggle */}
-                  <div className="flex items-center justify-between space-x-2 p-3 bg-slate-700 rounded-lg">
+                  <div className="flex items-center justify-between space-x-2 p-3 bg-accent/30 rounded-lg border border-border transition-colors duration-300">
                     <div className="space-y-1">
-                      <Label className="text-sm font-medium text-white">
+                      <Label className="text-sm font-medium text-foreground">
                         🌟 Chef Special
                       </Label>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-muted-foreground">
                         Mark this item as popular or chef's recommendation
                       </p>
                     </div>
                     <Switch
                       checked={editFormData.popular}
                       onCheckedChange={handleEditPopularToggle}
-                      className="data-[state=checked]:bg-coral"
+                      className="data-[state=checked]:bg-coral transition-colors duration-300"
                     />
                   </div>
 
@@ -849,12 +853,12 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="editPrice"
-                      className="text-sm font-medium text-white"
+                      className="text-sm font-medium text-foreground"
                     >
                       Price *
                     </Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                         $
                       </span>
                       <Input
@@ -866,13 +870,13 @@ export default function Dashboard() {
                         placeholder="0.00"
                         value={editFormData.price}
                         onChange={handleEditInputChange}
-                        className={`h-10 pl-8 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 ${
-                          errors.price ? "border-red-500" : ""
+                        className={`h-10 pl-8 bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110 ${
+                          errors.price ? "border-destructive" : ""
                         }`}
                       />
                     </div>
                     {errors.price && (
-                      <p className="text-xs text-red-400">{errors.price}</p>
+                      <p className="text-xs text-destructive">{errors.price}</p>
                     )}
                   </div>
 
@@ -882,14 +886,14 @@ export default function Dashboard() {
                       type="button"
                       variant="outline"
                       onClick={() => setIsEditModalOpen(false)}
-                      className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                      className="flex-1 border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-300 hover:brightness-110"
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-300 hover:brightness-110"
                     >
                       {isSubmitting ? (
                         <>
