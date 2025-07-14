@@ -313,7 +313,7 @@ export default function Dashboard() {
   // Delete menu item handlers
   const openDeleteModal = (item: any) => {
     setItemToDelete(item);
-    setIsDeleteModalOpen(true);
+    setIsDeleteItemModalOpen(true);
   };
 
   const handleDeleteItem = async () => {
