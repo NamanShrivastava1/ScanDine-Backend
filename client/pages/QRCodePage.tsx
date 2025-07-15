@@ -265,113 +265,179 @@ export default function QRCodePage() {
           {/* Page Title */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Your QR Code
+              {qrCodeGenerated ? "Your QR Code" : "QR Code Generator"}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Download and print your QR code for customers to scan
+              {qrCodeGenerated
+                ? "Download and print your QR code for customers to scan"
+                : "Generate your QR code to start accepting digital menu orders"}
             </p>
           </div>
 
-          {/* QR Code Card */}
-          <Card className="border-none shadow-lg bg-card/70 backdrop-blur-sm mb-8">
-            <CardContent className="p-8">
-              {/* QR Code Display */}
-              <div className="flex justify-center mb-6">
-                <div className="p-8 bg-sage rounded-2xl shadow-lg">
-                  <div className="w-64 h-64 bg-white rounded-lg flex items-center justify-center">
-                    <div className="w-56 h-56 bg-black rounded-lg flex items-center justify-center relative">
-                      {/* QR Code Pattern - Simplified representation */}
-                      <div className="grid grid-cols-8 gap-1 w-48 h-48">
-                        {Array.from({ length: 64 }, (_, i) => (
-                          <div
-                            key={i}
-                            className={`w-full h-full ${
-                              Math.random() > 0.5 ? "bg-black" : "bg-white"
-                            }`}
-                          />
-                        ))}
-                      </div>
+          {/* Conditional Content */}
+          {!qrCodeGenerated ? (
+            /* No QR Code Generated State */
+            <Card className="border-none shadow-lg bg-card/70 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="w-24 h-24 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <QrCode className="w-12 h-12 text-muted-foreground" />
+                </div>
 
-                      {/* Corner squares */}
-                      <div className="absolute top-2 left-2 w-8 h-8 bg-black"></div>
-                      <div className="absolute top-2 right-2 w-8 h-8 bg-black"></div>
-                      <div className="absolute bottom-2 left-2 w-8 h-8 bg-black"></div>
+                <h2 className="text-2xl font-bold text-foreground mb-4">
+                  No QR code generated yet
+                </h2>
+
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  Create your QR code to let customers access your digital menu
+                  instantly. Once generated, you can download and print it for
+                  your café.
+                </p>
+
+                <Button
+                  onClick={handleGenerateQR}
+                  disabled={isGenerating}
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 h-12 transition-colors duration-300 hover:brightness-110"
+                >
+                  {isGenerating ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
+                      Generating QR Code...
+                    </>
+                  ) : (
+                    <>
+                      <QrCode className="w-5 h-5 mr-3" />
+                      Generate QR Code
+                    </>
+                  )}
+                </Button>
+
+                <div className="mt-8 p-4 bg-accent/20 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Your QR will link to:</strong>
+                    <br />
+                    <span className="font-mono text-xs">{menuUrl}</span>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            /* QR Code Generated State */
+            <Card className="border-none shadow-lg bg-card/70 backdrop-blur-sm mb-8">
+              <CardContent className="p-8">
+                {/* QR Code Display */}
+                <div className="flex justify-center mb-6">
+                  <div className="p-8 bg-sage rounded-2xl shadow-lg">
+                    <div className="w-64 h-64 bg-white rounded-lg flex items-center justify-center">
+                      <div className="w-56 h-56 bg-black rounded-lg flex items-center justify-center relative">
+                        {/* QR Code Pattern - Simplified representation */}
+                        <div className="grid grid-cols-8 gap-1 w-48 h-48">
+                          {Array.from({ length: 64 }, (_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full h-full ${
+                                Math.random() > 0.5 ? "bg-black" : "bg-white"
+                              }`}
+                            />
+                          ))}
+                        </div>
+
+                        {/* Corner squares */}
+                        <div className="absolute top-2 left-2 w-8 h-8 bg-black"></div>
+                        <div className="absolute top-2 right-2 w-8 h-8 bg-black"></div>
+                        <div className="absolute bottom-2 left-2 w-8 h-8 bg-black"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Café Info */}
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold text-foreground mb-2">
-                  {cafeData.name}
-                </h2>
-                <p className="text-sm text-muted-foreground font-mono bg-muted/30 px-3 py-1 rounded-md inline-block">
-                  {menuUrl}
-                </p>
-              </div>
+                {/* Café Info */}
+                <div className="text-center mb-6">
+                  <h2 className="text-xl font-semibold text-foreground mb-2">
+                    {cafeData.name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground font-mono bg-muted/30 px-3 py-1 rounded-md inline-block">
+                    {menuUrl}
+                  </p>
+                </div>
 
-              {/* Download Buttons */}
-              <div className="flex gap-3 mb-4">
+                {/* Download Buttons */}
+                <div className="flex gap-3 mb-4">
+                  <Button
+                    onClick={handleDownloadPNG}
+                    disabled={isDownloading}
+                    variant="outline"
+                    className="flex-1 h-12 transition-colors duration-300 hover:brightness-110"
+                  >
+                    {isDownloading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PNG
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    onClick={handleDownloadSVG}
+                    disabled={isDownloading}
+                    variant="outline"
+                    className="flex-1 h-12 transition-colors duration-300 hover:brightness-110"
+                  >
+                    {isDownloading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Download SVG
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Print Button */}
                 <Button
-                  onClick={handleDownloadPNG}
-                  disabled={isDownloading}
-                  variant="outline"
-                  className="flex-1 h-12 transition-colors duration-300 hover:brightness-110"
+                  onClick={handlePrint}
+                  disabled={isPrinting}
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-300 hover:brightness-110"
                 >
-                  {isDownloading ? (
+                  {isPrinting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                      Downloading...
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Opening Print...
                     </>
                   ) : (
                     <>
-                      <Download className="w-4 h-4 mr-2" />
-                      Download PNG
+                      <Printer className="w-4 h-4 mr-2" />
+                      Print QR Code
                     </>
                   )}
                 </Button>
 
-                <Button
-                  onClick={handleDownloadSVG}
-                  disabled={isDownloading}
-                  variant="outline"
-                  className="flex-1 h-12 transition-colors duration-300 hover:brightness-110"
-                >
-                  {isDownloading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                      Downloading...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4 mr-2" />
-                      Download SVG
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Print Button */}
-              <Button
-                onClick={handlePrint}
-                disabled={isPrinting}
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-300 hover:brightness-110"
-              >
-                {isPrinting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Opening Print...
-                  </>
-                ) : (
-                  <>
-                    <Printer className="w-4 h-4 mr-2" />
-                    Print QR Code
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+                {/* Regenerate Option */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <Button
+                    onClick={() => {
+                      setQrCodeGenerated(false);
+                      localStorage.removeItem(`qr_generated_${cafeData.id}`);
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  >
+                    Regenerate QR Code
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Instructions Card */}
           <Card className="border-none shadow-sm bg-card/50">
