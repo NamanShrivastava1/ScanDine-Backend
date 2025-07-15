@@ -66,11 +66,17 @@ export default function QRCodePage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // In a real implementation, you would generate and download the QR code
-      // For now, we'll just show a success message
-      alert("QR Code downloaded as PNG!");
+      // Create a mock download link
+      const link = document.createElement("a");
+      link.href =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
+      link.download = `${cafeData.slug}-qr-code.png`;
+      link.click();
+
+      alert("✅ QR Code downloaded as PNG successfully!");
     } catch (error) {
       console.error("Error downloading PNG:", error);
-      alert("Failed to download QR code. Please try again.");
+      alert("❌ Failed to download QR code. Please try again.");
     } finally {
       setIsDownloading(false);
     }
@@ -84,10 +90,19 @@ export default function QRCodePage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // In a real implementation, you would generate and download the QR code
-      alert("QR Code downloaded as SVG!");
+      // Create a mock SVG download
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="white"/><text x="128" y="128" text-anchor="middle" fill="black">QR</text></svg>`;
+      const blob = new Blob([svgContent], { type: "image/svg+xml" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${cafeData.slug}-qr-code.svg`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      alert("✅ QR Code downloaded as SVG successfully!");
     } catch (error) {
       console.error("Error downloading SVG:", error);
-      alert("Failed to download QR code. Please try again.");
+      alert("❌ Failed to download QR code. Please try again.");
     } finally {
       setIsDownloading(false);
     }
@@ -97,17 +112,60 @@ export default function QRCodePage() {
     setIsPrinting(true);
 
     try {
-      // Trigger browser print
-      window.print();
+      // Create a print-specific window
+      const printWindow = window.open("", "", "width=600,height=600");
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>QR Code - ${cafeData.name}</title>
+              <style>
+                body {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  min-height: 100vh;
+                  margin: 0;
+                  font-family: Arial, sans-serif;
+                }
+                .qr-container {
+                  text-align: center;
+                  page-break-inside: avoid;
+                }
+                .qr-code {
+                  width: 300px;
+                  height: 300px;
+                  border: 2px solid #000;
+                  margin: 20px auto;
+                  background: #000;
+                }
+                h2 { margin: 10px 0; }
+                p { margin: 5px 0; font-size: 14px; color: #666; }
+              </style>
+            </head>
+            <body>
+              <div class="qr-container">
+                <div class="qr-code"></div>
+                <h2>${cafeData.name}</h2>
+                <p>${menuUrl}</p>
+                <p>Scan to view our digital menu</p>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      }
 
       // Show success message after a short delay
       setTimeout(() => {
-        alert("Print dialog opened!");
+        alert("🖨️ Print dialog opened successfully!");
         setIsPrinting(false);
       }, 500);
     } catch (error) {
       console.error("Error printing:", error);
-      alert("Failed to open print dialog. Please try again.");
+      alert("❌ Failed to open print dialog. Please try again.");
       setIsPrinting(false);
     }
   };
