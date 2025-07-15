@@ -62,7 +62,7 @@ export default function About() {
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-            🚀 About Us
+            ��� About Us
           </h1>
           <h2 className="text-2xl md:text-3xl font-semibold text-primary mb-8">
             Turning Local Cafés Digital—One QR at a Time.
@@ -77,102 +77,131 @@ export default function About() {
       </section>
 
       {/* Founders Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             👨‍💻 Meet the Founders
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Two passionate developers bringing their vision to life
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Two passionate developers bringing their vision to life with
+            cutting-edge technology
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Arif Mansoori Card */}
-          <Card className="border-none shadow-lg bg-card/70 backdrop-blur-sm hover:shadow-xl transition-shadow">
-            <CardHeader className="text-center pb-6">
-              <div className="w-32 h-32 bg-gradient-to-br from-primary to-food-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-4xl font-bold text-white">AM</span>
+          <Card className="group border-none shadow-lg bg-card/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:scale-105 rounded-xl overflow-hidden animate-fade-in">
+            <CardHeader className="text-center pb-8 pt-8">
+              <div className="w-36 h-36 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110">
+                <span className="text-5xl font-bold text-white tracking-wide">
+                  AM
+                </span>
               </div>
-              <CardTitle className="text-2xl font-bold text-foreground">
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">
                 Arif Mansoori
               </CardTitle>
-              <CardDescription className="text-lg font-medium text-primary">
+              <CardDescription className="text-lg font-semibold text-orange-600 mb-3">
                 Frontend Developer & UI/UX Designer
               </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
               <div className="space-y-2">
-                <p className="font-medium text-muted-foreground">
-                  B.Tech CSE | LNCT Bhopal
+                <p className="font-semibold text-muted-foreground text-base">
+                  B.Tech CSE | TIT Bhopal
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  Loves clean UI, MMA, and making useful tech for real people.
+                <p className="text-muted-foreground leading-relaxed text-base px-4">
+                  Loves clean UI and building useful tech for real people.
                 </p>
               </div>
-              <div className="flex justify-center gap-3 pt-4">
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="flex justify-center gap-4 pt-6">
                 <Button
+                  asChild
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+                  size="lg"
+                  className="flex items-center gap-3 hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-all duration-300 hover:scale-105 px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
                 >
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
-                  <ExternalLink className="w-3 h-3" />
+                  <a
+                    href="https://www.linkedin.com/in/mohammad-arif-mansoori"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                    LinkedIn
+                  </a>
                 </Button>
                 <Button
+                  asChild
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-gray-50 hover:border-gray-400"
+                  size="lg"
+                  className="flex items-center gap-3 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700 transition-all duration-300 hover:scale-105 px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
                 >
-                  <Github className="w-4 h-4" />
-                  GitHub
-                  <ExternalLink className="w-3 h-3" />
+                  <a
+                    href="https://github.com/epex786"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="w-5 h-5" />
+                    GitHub
+                  </a>
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Friend's Card */}
-          <Card className="border-none shadow-lg bg-card/70 backdrop-blur-sm hover:shadow-xl transition-shadow">
-            <CardHeader className="text-center pb-6">
-              <div className="w-32 h-32 bg-gradient-to-br from-fresh-500 to-fresh-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-4xl font-bold text-white">FN</span>
+          {/* Naman Shrivastava Card */}
+          <Card className="group border-none shadow-lg bg-card/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:scale-105 rounded-xl overflow-hidden animate-fade-in-delayed">
+            <CardHeader className="text-center pb-8 pt-8">
+              <div className="w-36 h-36 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110">
+                <span className="text-5xl font-bold text-white tracking-wide">
+                  NS
+                </span>
               </div>
-              <CardTitle className="text-2xl font-bold text-foreground">
-                [Friend's Name]
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">
+                Naman Shrivastava
               </CardTitle>
-              <CardDescription className="text-lg font-medium text-fresh-600">
+              <CardDescription className="text-lg font-semibold text-green-600 mb-3">
                 Backend Developer & System Architect
               </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
               <div className="space-y-2">
-                <p className="font-medium text-muted-foreground">
-                  B.Tech CSE | LNCT Bhopal
+                <p className="font-semibold text-muted-foreground text-base">
+                  B.Tech CSE | TIT Bhopal
                 </p>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-base px-4">
                   Handles the logic, routes, and chaos behind the scenes.
                 </p>
               </div>
-              <div className="flex justify-center gap-3 pt-4">
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="flex justify-center gap-4 pt-6">
                 <Button
+                  asChild
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+                  size="lg"
+                  className="flex items-center gap-3 hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-all duration-300 hover:scale-105 px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
                 >
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
-                  <ExternalLink className="w-3 h-3" />
+                  <a
+                    href="https://www.linkedin.com/in/naman-shrivastava1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                    LinkedIn
+                  </a>
                 </Button>
                 <Button
+                  asChild
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 hover:bg-gray-50 hover:border-gray-400"
+                  size="lg"
+                  className="flex items-center gap-3 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700 transition-all duration-300 hover:scale-105 px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
                 >
-                  <Github className="w-4 h-4" />
-                  GitHub
-                  <ExternalLink className="w-3 h-3" />
+                  <a
+                    href="https://www.github.com/NamanShrivastava1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="w-5 h-5" />
+                    GitHub
+                  </a>
                 </Button>
               </div>
             </CardContent>
