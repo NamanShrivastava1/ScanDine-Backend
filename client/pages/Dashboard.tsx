@@ -521,9 +521,18 @@ export default function Dashboard() {
                     </Button>
                   </div>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Save Changes
-                </Button>
+                <div className="flex gap-3">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Save Changes
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-sage text-sage hover:bg-sage/10"
+                  >
+                    <Link to="/dashboard/qrcode">Generate QR Code</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
