@@ -37,6 +37,27 @@ export default function QRCodePage() {
     }
   });
 
+  const handleGenerateQR = async () => {
+    setIsGenerating(true);
+
+    try {
+      // Simulate QR generation process
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // In a real implementation, you would call a QR generation API
+      // For now, we'll mark it as generated and save to localStorage
+      setQrCodeGenerated(true);
+      localStorage.setItem(`qr_generated_${cafeData.id}`, "true");
+
+      alert("QR Code generated successfully!");
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      alert("Failed to generate QR code. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleDownloadPNG = async () => {
     setIsDownloading(true);
 
