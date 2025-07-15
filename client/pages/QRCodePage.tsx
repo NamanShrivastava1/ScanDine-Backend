@@ -14,17 +14,28 @@ import { useDarkMode } from "@/hooks/use-dark-mode";
 export default function QRCodePage() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   // Mock café data - replace with real data later
   const cafeData = {
     id: "cafe-central-123",
+    slug: "cafe-central",
     name: "Café Central",
     hasInfo: true,
     hasMenu: true,
   };
 
-  const menuUrl = `https://menuqr.app/menu/${cafeData.id}`;
+  const menuUrl = `https://menuqr.app/menu/${cafeData.slug}`;
+
+  // Check if QR code exists on component mount
+  useState(() => {
+    const savedQrStatus = localStorage.getItem(`qr_generated_${cafeData.id}`);
+    if (savedQrStatus === "true") {
+      setQrCodeGenerated(true);
+    }
+  });
 
   const handleDownloadPNG = async () => {
     setIsDownloading(true);
