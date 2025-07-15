@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Search from "./pages/Search";
 import MenuDisplay from "./pages/MenuDisplay";
 import Dashboard from "./pages/Dashboard";
+import QRCodePage from "./pages/QRCodePage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import SignUp from "./pages/SignUp";
