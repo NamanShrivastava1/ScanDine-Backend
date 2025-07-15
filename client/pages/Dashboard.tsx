@@ -1058,9 +1058,18 @@ export default function Dashboard() {
                       SVG
                     </Button>
                   </div>
-                  <Button className="w-full bg-coral hover:bg-coral/90 text-coral-foreground">
-                    Print QR Code
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button className="flex-1 bg-coral hover:bg-coral/90 text-coral-foreground">
+                      Print QR Code
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="flex-1 border-primary text-primary hover:bg-primary/10"
+                    >
+                      <Link to="/dashboard/qrcode">Generate QR Code</Link>
+                    </Button>
+                  </div>
                 </div>
                 <div className="bg-cream rounded-lg p-4 text-left">
                   <h4 className="font-semibold mb-2">How to use:</h4>
