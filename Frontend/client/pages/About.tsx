@@ -37,7 +37,7 @@ export default function About() {
                 <QrCode className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-semibold text-foreground">
-                MenuQR
+                ScanDine
               </span>
             </Link>
           </div>
@@ -295,7 +295,7 @@ export default function About() {
               <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
                 <QrCode className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-foreground">MenuQR</span>
+              <span className="font-semibold text-foreground">ScanDine</span>
             </div>
             <div className="flex gap-6 text-sm text-muted-foreground">
               <Link to="/" className="hover:text-foreground transition-colors">
