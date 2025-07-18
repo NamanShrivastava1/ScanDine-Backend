@@ -5,7 +5,8 @@ const { body } = require("express-validator");
 
 const cafeController = require("../controllers/cafe.controller");
 const userMiddleware = require("../middlewares/auth.js")
-const cafeMiddleware = require("../middlewares/cafeAuth.js")
+const cafeMiddleware = require("../middlewares/cafeAuth.js");
+const user = require("../models/user.model.js");
 
 router.post("/cafeinfo", [
     body("cafename")
@@ -20,6 +21,8 @@ router.post("/cafeinfo", [
         .isLength({ min: 10, max: 15 })
         .withMessage("Contact number must be between 10 and 15 digits"),
 ], userMiddleware.authenticateUser, cafeController.cafeInfo)
+
+router.get("/mycafe", userMiddleware.authenticateUser, cafeController.showCafe);
 
 router.post("/menu", [
     body("dishName")

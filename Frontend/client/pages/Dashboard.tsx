@@ -50,8 +50,10 @@ import {
   Sun,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDarkMode } from "@/hooks/use-dark-mode";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -73,11 +75,13 @@ export default function Dashboard() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const navigate = useNavigate();
+
   // User profile data
-  const [profileData] = useState({
-    fullName: "Arif Mansoori",
-    email: "arif@menuqr.com",
-    mobile: "+91 98765 43210",
+  const [profileData, setProfileData] = useState({
+    fullname: "",
+    email: "",
+    mobile: "",
   });
 
   // Delete account state
@@ -105,6 +109,20 @@ export default function Dashboard() {
     "Coffee & Tea",
     "Beverages",
   ];
+
+  interface CafeInfo {
+    cafename: string;
+    phoneNo: string;
+    address: string;
+    description: string;
+  }
+
+  const [cafeinfo, setCafeinfo] = useState<CafeInfo>({
+    cafename: "Café Central",
+    phoneNo: "5551234567",
+    address: "123 Main Street, Anytown",
+    description: "Artisanal coffee and fresh pastries in the heart of downtown",
+  });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -358,35 +376,18 @@ export default function Dashboard() {
     setIsDeletingAccount(true);
 
     try {
-      // Send DELETE request to API
-      const response = await fetch("/api/users/delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.delete(
+        "http://localhost:4000/api/users/delete",
+        {
+          withCredentials: true,
         },
-        credentials: "include", // Include cookies for authentication
-      });
+      );
 
-      if (response.ok || true) {
-        // Always succeed for demo
-        // Account deleted successfully
-        alert(
-          "Account deleted successfully. You will be redirected to the homepage.",
-        );
-
-        // Close modal and redirect to homepage
-        setIsDeleteModalOpen(false);
-
-        // Redirect to homepage after a short delay
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
+      if (response.data.status === 200) {
+        alert("Your account has been deleted successfully!");
+        navigate("/");
       } else {
-        // Handle error response
-        const errorData = await response.json().catch(() => ({}));
-        alert(
-          errorData.message || "Failed to delete account. Please try again.",
-        );
+        alert("Failed to delete account. Please try again.");
       }
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -395,6 +396,88 @@ export default function Dashboard() {
       setIsDeletingAccount(false);
     }
   };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setCafeinfo((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const signOutHandler = async () => {
+    const response = await axios.get("http://localhost:4000/api/users/logout", {
+      withCredentials: true,
+    });
+
+    navigate("/signin");
+
+    alert("You have been signed out successfully!");
+    console.log(response);
+  };
+
+  useEffect(() => {
+    const getUserProfile = async () => {
+      const response = await axios.get(
+        "http://localhost:4000/api/users/dashboard/profile",
+        {
+          withCredentials: true,
+        },
+      );
+      setProfileData({
+        fullname: response.data.user.fullname,
+        email: response.data.user.email,
+        mobile: response.data.user.mobile,
+      });
+      console.log(response);
+    };
+
+    getUserProfile();
+  }, [formData]);
+
+  const cafeInfoHandler = async () => {
+    console.log("Sending cafe info:", cafeinfo);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/dashboard/cafeinfo",
+        cafeinfo,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true, // ✅ REQUIRED for sending cookies
+        },
+      );
+
+      // Optional: show success message or update UI
+      console.log("Cafe added:", response.data);
+    } catch (error) {
+      console.error(
+        "Error adding cafe:",
+        error.response?.data || error.message,
+      );
+    }
+  };
+
+  useEffect(() => {
+    const fetchCafeInfo = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:4000/api/dashboard/mycafe",
+          {
+            withCredentials: true, // Send cookies with the request
+          },
+        );
+        setCafeinfo(res.data.cafe); // set the form values from backend
+      } catch (error) {
+        console.error(
+          "Error fetching cafe info:",
+          error.response?.data || error.message,
+        );
+      }
+    };
+
+    fetchCafeInfo();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -445,7 +528,7 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <Button variant="outline" size="sm">
+              <Button onClick={signOutHandler} variant="outline" size="sm">
                 Sign Out
               </Button>
             </div>
@@ -476,34 +559,42 @@ export default function Dashboard() {
                   <div>
                     <Label htmlFor="cafe-name">Café Name</Label>
                     <Input
-                      id="cafe-name"
+                      id="cafename"
+                      name="cafename"
+                      value={cafeinfo.cafename}
+                      onChange={handleChange}
                       placeholder="Your café name"
-                      defaultValue="Café Central"
                     />
                   </div>
                   <div>
                     <Label htmlFor="cafe-phone">Phone Number</Label>
                     <Input
-                      id="cafe-phone"
+                      id="phoneNo"
+                      name="phoneNo"
+                      value={cafeinfo.phoneNo}
+                      onChange={handleChange}
                       placeholder="(555) 123-4567"
-                      defaultValue="(555) 123-4567"
                     />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="cafe-address">Address</Label>
                   <Input
-                    id="cafe-address"
+                    id="address"
+                    name="address"
+                    value={cafeinfo.address}
+                    onChange={handleChange}
                     placeholder="123 Main Street, Anytown"
-                    defaultValue="123 Main Street, Anytown"
                   />
                 </div>
                 <div>
                   <Label htmlFor="cafe-description">Description</Label>
                   <Textarea
-                    id="cafe-description"
+                    id="description"
+                    name="description"
+                    value={cafeinfo.description}
+                    onChange={handleChange}
                     placeholder="Describe your café..."
-                    defaultValue="Artisanal coffee and fresh pastries in the heart of downtown"
                   />
                 </div>
                 <div>
@@ -522,7 +613,10 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Button
+                    onClick={cafeInfoHandler}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
                     Save Changes
                   </Button>
                   <Button
@@ -1124,7 +1218,7 @@ export default function Dashboard() {
                     </Label>
                     <div className="h-11 px-3 py-2 bg-muted/30 border border-border rounded-md flex items-center">
                       <span className="text-foreground">
-                        {profileData.fullName}
+                        {profileData.fullname}
                       </span>
                     </div>
                   </div>

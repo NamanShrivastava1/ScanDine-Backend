@@ -11,10 +11,16 @@ import {
 import { QrCode, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
+import { body } from "express-validator";
+import { response } from "express";
+import { set } from "date-fns";
+import { useNavigate } from "react-router-dom";
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
-    fullName: "",
+    fullname: "",
     email: "",
     mobile: "",
     password: "",
@@ -25,15 +31,42 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/users/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      console.log(response.data);
+
+      setFormData({
+        fullname: "",
+        email: "",
+        mobile: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      navigate("/signin")
+    } catch (error) {
+      console.log("Error during registration:", error);
+    }
     // Basic validation
     const newErrors: Record<string, string> = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+    if (!formData.fullname.trim()) {
+      newErrors.fullname = "Full name is required";
     }
 
     if (!formData.email.trim()) {
@@ -123,15 +156,15 @@ export default function SignUp() {
               </Label>
               <Input
                 id="fullName"
-                name="fullName"
+                name="fullname"
                 type="text"
                 placeholder="Enter your full name"
-                value={formData.fullName}
+                value={formData.fullname}
                 onChange={handleInputChange}
-                className={`h-11 ${errors.fullName ? "border-destructive" : ""}`}
+                className={`h-11 ${errors.fullname ? "border-destructive" : ""}`}
               />
-              {errors.fullName && (
-                <p className="text-xs text-destructive">{errors.fullName}</p>
+              {errors.fullname && (
+                <p className="text-xs text-destructive">{errors.fullname}</p>
               )}
             </div>
 

@@ -139,6 +139,7 @@ module.exports.deleteUser = async (req, res) => {
                 message: "User not found"
             });
         }
+        res.clearCookie("token");
         res.status(200).json({
             message: "User deleted successfully"
         });

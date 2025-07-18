@@ -9,8 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QrCode, ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -21,11 +22,13 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Basic validation
+    // ✅ Basic validation before request
     const newErrors: Record<string, string> = {};
 
     if (!formData.email.trim()) {
@@ -45,11 +48,45 @@ export default function SignIn() {
 
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/users/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+
+      console.log(response.data);
+      alert("Welcome to ScanDine!");
+
+      setFormData({ email: "", password: "" });
+
+      navigate("/");
+    } catch (error: any) {
+      console.log("Error during Login:", error);
+
+      // Handle backend validation errors
+      if (axios.isAxiosError(error)) {
+        const backendMessage = error.response?.data?.message;
+        if (backendMessage) {
+          setErrors((prev) => ({
+            ...prev,
+            general: backendMessage,
+          }));
+        }
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          general: "Something went wrong. Please try again.",
+        }));
+      }
+    }
 
     setIsSubmitting(false);
-    alert("Welcome back to MenuQR!");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +99,6 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-background to-accent flex items-center justify-center p-4">
-      {/* Back to Home */}
       <div className="absolute top-6 left-6">
         <Button
           asChild
@@ -77,7 +113,6 @@ export default function SignIn() {
         </Button>
       </div>
 
-      {/* Sign In Card */}
       <Card className="w-full max-w-md border-none shadow-xl bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -128,7 +163,9 @@ export default function SignIn() {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`h-11 pr-10 ${errors.password ? "border-destructive" : ""}`}
+                  className={`h-11 pr-10 ${
+                    errors.password ? "border-destructive" : ""
+                  }`}
                 />
                 <Button
                   type="button"
@@ -148,6 +185,13 @@ export default function SignIn() {
                 <p className="text-xs text-destructive">{errors.password}</p>
               )}
             </div>
+
+            {/* Backend Error Message */}
+            {errors.general && (
+              <p className="text-sm text-destructive text-center">
+                {errors.general}
+              </p>
+            )}
 
             {/* Forgot Password Link */}
             <div className="text-right">
