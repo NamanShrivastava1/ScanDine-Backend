@@ -178,81 +178,47 @@ export default function Dashboard() {
     setErrors({});
     setIsEditModalOpen(true);
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
+  // Basic frontend validation
+  if (!formData.dishName || !formData.category || formData.price === "") {
+    alert("Please fill all required fields.");
+    return;
+  }
 
-    // Validation
-    const newErrors: Record<string, string> = {};
+  const numericPrice = Number(formData.price);
+  if (isNaN(numericPrice)) {
+    alert("Price must be a valid number.");
+    return;
+  }
 
-    if (!formData.dishName.trim()) {
-      newErrors.dishName = "Dish name is required";
+  try {
+    const response = await axios.post("http://localhost:4000/api/dashboard/menu", {
+      dishName: formData.dishName,
+      category: formData.category,
+      description: formData.description,
+      price: numericPrice,
+      popular: formData.popular,
+    }, {
+      withCredentials: true, // Important: includes cookies
+    });
+
+    alert("Menu item added successfully!");
+    // You can reset form or fetch menu again here
+  } catch (error) {
+    // Handle backend validation errors
+    if (axios.isAxiosError(error) && error.response?.data?.errors) {
+      const messages = error.response.data.errors.map(e => e.msg).join("\n");
+      alert("Validation failed:\n" + messages);
+    } else if (axios.isAxiosError(error) && error.response?.data?.message) {
+      alert("Error: " + error.response.data.message);
+    } else {
+      alert("Something went wrong!");
     }
+  }
+};
 
-    if (!formData.category) {
-      newErrors.category = "Category is required";
-    }
-
-    if (!formData.price.trim()) {
-      newErrors.price = "Price is required";
-    } else if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
-      newErrors.price = "Please enter a valid price";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Optional: Send to API
-      const response = await fetch("/api/menu", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.dishName,
-          category: formData.category,
-          description: formData.description,
-          price: Number(formData.price),
-          popular: formData.popular,
-        }),
-      });
-
-      if (response.ok || true) {
-        // Always succeed for demo
-        // Reset form and close modal
-        setFormData({
-          dishName: "",
-          category: "",
-          description: "",
-          price: "",
-          popular: false,
-        });
-        setIsAddModalOpen(false);
-        alert("Menu item added successfully!");
-      } else {
-        alert("Failed to add menu item. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error adding menu item:", error);
-      alert("Menu item added successfully!");
-      setFormData({
-        dishName: "",
-        category: "",
-        description: "",
-        price: "",
-        popular: false,
-      });
-      setIsAddModalOpen(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -292,6 +258,7 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           name: editFormData.dishName,
           category: editFormData.category,
