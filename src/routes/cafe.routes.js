@@ -22,8 +22,6 @@ router.post("/cafeinfo", [
         .withMessage("Contact number must be between 10 and 15 digits"),
 ], userMiddleware.authenticateUser, cafeController.cafeInfo)
 
-router.get("/mycafe", userMiddleware.authenticateUser, cafeController.showCafe);
-
 router.post("/menu", [
     body("dishName")
         .notEmpty()
@@ -37,6 +35,9 @@ router.post("/menu", [
         .notEmpty()
         .withMessage("Category is required")
 ], cafeMiddleware.authenticateCafe, cafeController.addMenuItems);
+
+// for dashboard context
+router.get("/my-menu", cafeMiddleware.authenticateCafe, cafeController.getMyMenuItems);
 
 router.get("/menu/:cafeId", cafeController.getMenuItemsByCafe);
 

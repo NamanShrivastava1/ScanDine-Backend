@@ -56,6 +56,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+
+  const [menuItems, setMenuItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -178,47 +183,52 @@ export default function Dashboard() {
     setErrors({});
     setIsEditModalOpen(true);
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Basic frontend validation
-  if (!formData.dishName || !formData.category || formData.price === "") {
-    alert("Please fill all required fields.");
-    return;
-  }
-
-  const numericPrice = Number(formData.price);
-  if (isNaN(numericPrice)) {
-    alert("Price must be a valid number.");
-    return;
-  }
-
-  try {
-    const response = await axios.post("http://localhost:4000/api/dashboard/menu", {
-      dishName: formData.dishName,
-      category: formData.category,
-      description: formData.description,
-      price: numericPrice,
-      popular: formData.popular,
-    }, {
-      withCredentials: true, // Important: includes cookies
-    });
-
-    alert("Menu item added successfully!");
-    // You can reset form or fetch menu again here
-  } catch (error) {
-    // Handle backend validation errors
-    if (axios.isAxiosError(error) && error.response?.data?.errors) {
-      const messages = error.response.data.errors.map(e => e.msg).join("\n");
-      alert("Validation failed:\n" + messages);
-    } else if (axios.isAxiosError(error) && error.response?.data?.message) {
-      alert("Error: " + error.response.data.message);
-    } else {
-      alert("Something went wrong!");
+    // Basic frontend validation
+    if (!formData.dishName || !formData.category || formData.price === "") {
+      alert("Please fill all required fields.");
+      return;
     }
-  }
-};
 
+    const numericPrice = Number(formData.price);
+    if (isNaN(numericPrice)) {
+      alert("Price must be a valid number.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/dashboard/menu",
+        {
+          dishName: formData.dishName,
+          category: formData.category,
+          description: formData.description,
+          price: numericPrice,
+          popular: formData.popular,
+        },
+        {
+          withCredentials: true, // Important: includes cookies
+        },
+      );
+
+      alert("Menu item added successfully!");
+      // You can reset form or fetch menu again here
+    } catch (error) {
+      // Handle backend validation errors
+      if (axios.isAxiosError(error) && error.response?.data?.errors) {
+        const messages = error.response.data.errors
+          .map((e) => e.msg)
+          .join("\n");
+        alert("Validation failed:\n" + messages);
+      } else if (axios.isAxiosError(error) && error.response?.data?.message) {
+        alert("Error: " + error.response.data.message);
+      } else {
+        alert("Something went wrong!");
+      }
+    }
+  };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -425,26 +435,44 @@ const handleSubmit = async (e) => {
     }
   };
 
-  useEffect(() => {
-    const fetchCafeInfo = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:4000/api/dashboard/mycafe",
-          {
-            withCredentials: true, // Send cookies with the request
-          },
-        );
-        setCafeinfo(res.data.cafe); // set the form values from backend
-      } catch (error) {
-        console.error(
-          "Error fetching cafe info:",
-          error.response?.data || error.message,
-        );
-      }
+   const api = axios.create({
+        baseURL: 'http://localhost:4000/api/dashboard',
+        withCredentials: true, // This sends cookies automatically
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+   useEffect(() => {
+        fetchMenuItems();
+    }, []);
+
+    const fetchMenuItems = async () => {
+        try {
+            setLoading(true);
+            
+            // Only fetch menu items, no cafe data needed
+            const menuResponse = await api.get('/my-menu');
+            setMenuItems(menuResponse.data.menuItems || []);
+            console.log(menuResponse.data.menuItems);
+            
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+            
+            if (error.response?.status === 401) {
+                setError('Authentication failed. Please log in again.');
+            } else if (error.response?.status === 404) {
+                setError('No cafe found. Please create a cafe first.');
+            } else {
+                setError(error.response?.data?.message || 'Failed to fetch menu data');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
-    fetchCafeInfo();
-  }, []);
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="min-h-screen bg-background">
@@ -778,109 +806,63 @@ const handleSubmit = async (e) => {
 
             {/* Sample Menu Items */}
             <div className="space-y-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-muted rounded-lg"></div>
-                      <div>
-                        <h3 className="font-semibold">Cappuccino</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Espresso, steamed milk, and foam
-                        </p>
-                        <p className="font-semibold text-primary">$4.50</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          openEditModal({
-                            id: 1,
-                            name: "Cappuccino",
-                            category: "Coffee & Tea",
-                            description: "Espresso, steamed milk, and foam",
-                            price: 4.5,
-                            popular: true,
-                          })
-                        }
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          openDeleteModal({
-                            id: 1,
-                            name: "Cappuccino",
-                            category: "Coffee & Tea",
-                            description: "Espresso, steamed milk, and foam",
-                            price: 4.5,
-                            popular: true,
-                          })
-                        }
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-muted rounded-lg"></div>
-                      <div>
-                        <h3 className="font-semibold">Croissant</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Fresh baked daily
-                        </p>
-                        <p className="font-semibold text-primary">$2.75</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          openEditModal({
-                            id: 2,
-                            name: "Croissant",
-                            category: "Breakfast",
-                            description: "Fresh baked daily",
-                            price: 2.75,
-                            popular: false,
-                          })
-                        }
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          openDeleteModal({
-                            id: 2,
-                            name: "Croissant",
-                            category: "Breakfast",
-                            description: "Fresh baked daily",
-                            price: 2.75,
-                            popular: false,
-                          })
-                        }
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
+            {menuItems.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                    No menu items found. Add your first menu item!
+                </div>
+            ) : (
+                menuItems.map((item) => (
+                    <Card key={item._id}>
+                        <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 bg-muted rounded-lg"></div>
+                                    <div>
+                                        <h3 className="font-semibold">{item.dishName}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {item.description || 'No description available'}
+                                        </p>
+                                        <p className="font-semibold text-primary">${item.price}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            openEditModal({
+                                                _id: item._id,
+                                                dishName: item.dishName,
+                                                category: item.category,
+                                                description: item.description,
+                                                price: item.price,
+                                            })
+                                        }
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            openDeleteModal({
+                                                _id: item._id,
+                                                dishName: item.dishName,
+                                                category: item.category,
+                                                description: item.description,
+                                                price: item.price,
+                                            })
+                                        }
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))
+            )}
+        </div>
             {/* Edit Item Modal */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
               <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-card border-border shadow-lg transition-colors duration-300">
