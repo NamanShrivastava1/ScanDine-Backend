@@ -17,10 +17,45 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDarkMode } from "@/hooks/use-dark-mode";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Index() {
   // Dark mode functionality
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/users/me", {
+          withCredentials: true,
+        });
+        setIsLoggedIn(true);
+      } catch (err) {
+        setIsLoggedIn(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const signOutHandler = async () => {
+    const response = await axios.get("http://localhost:4000/api/users/logout", {
+      withCredentials: true,
+    });
+
+    setIsLoggedIn(false);
+    navigate("/signin");
+
+    alert("You have been signed out successfully!");
+    console.log(response);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-background to-accent">
@@ -66,9 +101,20 @@ export default function Index() {
               )}
             </Button>
 
-            <Button asChild variant="outline" size="sm">
-              <Link to="/signin">Sign In</Link>
-            </Button>
+            {isCheckingAuth ? null : isLoggedIn ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOutHandler}
+                className="h-9 w-auto"
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/signin">Sign In</Link>
+              </Button>
+            )}
           </div>
         </nav>
       </header>

@@ -121,6 +121,21 @@ module.exports.getUserProfile = async (req, res) => {
     }
 }
 
+exports.getCurrentUser = (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error("Error getting current user:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
 module.exports.logoutUser = async (req, res) => {
     res.clearCookie("token");
     const token = req.cookies.token || req.headers.authorization.split(" ")[1];

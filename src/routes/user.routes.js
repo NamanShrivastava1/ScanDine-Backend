@@ -46,6 +46,8 @@ router.post(
 
 router.get("/dashboard/profile", middleware.authenticateUser, userController.getUserProfile);
 
+router.get("/me", middleware.authenticateUser, userController.getCurrentUser);
+
 router.get("/logout", middleware.authenticateUser, userController.logoutUser);
 
 router.delete("/delete", middleware.authenticateUser, userController.deleteUser);
