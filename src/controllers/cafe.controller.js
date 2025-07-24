@@ -40,6 +40,26 @@ module.exports.cafeInfo = async (req, res) => {
     }
 }
 
+module.exports.showCafeInfo = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const cafe = await cafeModel.findOne({ user: userId });
+
+        if (!cafe) {
+            return res.status(404).json({ message: "Cafe not found" });
+        }
+
+        res.status(200).json({
+            message: "Cafe info fetched",
+            cafe,
+        });
+    } catch (error) {
+        console.error("Error fetching cafe info:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 module.exports.addMenuItems = async (req, res) => {
     try {
         const error = validationResult(req);
@@ -94,65 +114,65 @@ module.exports.getMenuItemsByCafe = async (req, res) => {
 };
 
 module.exports.updateMenuItem = async (req, res) => {
-  try {
-    const { menuItemId } = req.params;
+    try {
+        const { menuItemId } = req.params;
 
-    if (!menuItemId) {
-      return res.status(400).json({
-        message: "Menu item ID is required",
-      });
+        if (!menuItemId) {
+            return res.status(400).json({
+                message: "Menu item ID is required",
+            });
+        }
+
+        // ✅ Destructure all possible fields from body
+        const {
+            dishName,
+            price,
+            category,
+            description,
+            isChefSpecial,
+        } = req.body;
+
+        // ✅ Prepare update object dynamically (excluding undefined)
+        const updateFields = {};
+        if (dishName !== undefined) updateFields.dishName = dishName;
+        if (price !== undefined) updateFields.price = price;
+        if (category !== undefined) updateFields.category = category;
+        if (description !== undefined) updateFields.description = description;
+        if (isChefSpecial !== undefined) updateFields.isChefSpecial = isChefSpecial;
+
+        // ✅ Ensure at least one field is present
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({
+                message: "At least one field is required to update",
+            });
+        }
+
+        // ✅ Debug log
+        console.log("🔧 Updating Menu Item:", menuItemId, updateFields);
+
+        const updateMenu = await menuModel.findByIdAndUpdate(
+            menuItemId,
+            updateFields,
+            { new: true }
+        );
+
+        if (!updateMenu) {
+            return res.status(404).json({
+                message: "Menu item not found",
+            });
+        }
+
+        res.status(200).json({
+            message: "Menu item updated successfully",
+            menu: updateMenu,
+        });
+    } catch (error) {
+        console.error("❌ Error in updateMenuItem:", error);
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
     }
-
-    // ✅ Destructure all possible fields from body
-    const {
-      dishName,
-      price,
-      category,
-      description,
-      isChefSpecial,
-    } = req.body;
-
-    // ✅ Prepare update object dynamically (excluding undefined)
-    const updateFields = {};
-    if (dishName !== undefined) updateFields.dishName = dishName;
-    if (price !== undefined) updateFields.price = price;
-    if (category !== undefined) updateFields.category = category;
-    if (description !== undefined) updateFields.description = description;
-    if (isChefSpecial !== undefined) updateFields.isChefSpecial = isChefSpecial;
-
-    // ✅ Ensure at least one field is present
-    if (Object.keys(updateFields).length === 0) {
-      return res.status(400).json({
-        message: "At least one field is required to update",
-      });
-    }
-
-    // ✅ Debug log
-    console.log("🔧 Updating Menu Item:", menuItemId, updateFields);
-
-    const updateMenu = await menuModel.findByIdAndUpdate(
-      menuItemId,
-      updateFields,
-      { new: true }
-    );
-
-    if (!updateMenu) {
-      return res.status(404).json({
-        message: "Menu item not found",
-      });
-    }
-
-    res.status(200).json({
-      message: "Menu item updated successfully",
-      menu: updateMenu,
-    });
-  } catch (error) {
-    console.error("❌ Error in updateMenuItem:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
 };
 
 

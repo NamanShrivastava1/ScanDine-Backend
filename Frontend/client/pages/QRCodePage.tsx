@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/card";
 import { QrCode, ArrowLeft, Download, Printer, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDarkMode } from "@/hooks/use-dark-mode";
+import axios from "axios";
 
 export default function QRCodePage() {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -17,6 +18,18 @@ export default function QRCodePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const [qrImage, setQrImage] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("/api/dashboard/generate-qr", { withCredentials: true })
+      .then((res) => {
+        setQrImage(res.data.qrCode); // This is the base64 image
+      })
+      .catch((err) => {
+        console.error("QR Fetch Error:", err);
+      });
+  }, []);
 
   // Mock café data - replace with real data later
   const cafeData = {
@@ -387,23 +400,18 @@ export default function QRCodePage() {
                 <div className="flex justify-center mb-6">
                   <div className="p-8 bg-sage rounded-2xl shadow-lg">
                     <div className="w-64 h-64 bg-white rounded-lg flex items-center justify-center">
-                      <div className="w-56 h-56 bg-black rounded-lg flex items-center justify-center relative">
-                        {/* QR Code Pattern - Simplified representation */}
-                        <div className="grid grid-cols-8 gap-1 w-48 h-48">
-                          {Array.from({ length: 64 }, (_, i) => (
-                            <div
-                              key={i}
-                              className={`w-full h-full ${
-                                Math.random() > 0.5 ? "bg-black" : "bg-white"
-                              }`}
-                            />
-                          ))}
-                        </div>
-
-                        {/* Corner squares */}
-                        <div className="absolute top-2 left-2 w-8 h-8 bg-black"></div>
-                        <div className="absolute top-2 right-2 w-8 h-8 bg-black"></div>
-                        <div className="absolute bottom-2 left-2 w-8 h-8 bg-black"></div>
+                      <div className="w-56 h-56 bg-black rounded-lg flex items-center justify-center">
+                        {qrImage ? (
+                          <img
+                            src={qrImage}
+                            alt="QR Code"
+                            className="w-48 h-48 rounded bg-white p-1"
+                          />
+                        ) : (
+                          <span className="text-white animate-pulse">
+                            Loading...
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -412,10 +420,11 @@ export default function QRCodePage() {
                 {/* Café Info */}
                 <div className="text-center mb-6">
                   <h2 className="text-xl font-semibold text-foreground mb-2">
-                    {cafeData.name}
+                    {/* {cafeData.name} */}
                   </h2>
                   <p className="text-sm text-muted-foreground font-mono bg-muted/30 px-3 py-1 rounded-md inline-block">
-                    {menuUrl}
+                    {/* {menuUrl} */}
+                    Thank you for using ScanDine!
                   </p>
                 </div>
 

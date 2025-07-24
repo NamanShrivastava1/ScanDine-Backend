@@ -119,6 +119,7 @@ export default function Dashboard() {
     phoneNo: string;
     address: string;
     description: string;
+    logo: string;
   }
 
   const [cafeinfo, setCafeinfo] = useState<CafeInfo>({
@@ -126,6 +127,7 @@ export default function Dashboard() {
     phoneNo: "5551234567",
     address: "123 Main Street, Anytown",
     description: "Artisanal coffee and fresh pastries in the heart of downtown",
+    logo: "",
   });
 
   const handleInputChange = (
@@ -491,8 +493,34 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  useEffect(() => {
+    const fetchCafe = async () => {
+      try {
+        const res = await axios.get("/api/dashboard/showCafe", {
+          withCredentials: true,
+        });
+
+        const { cafename, phoneNo, address, description, logo } = res.data.cafe;
+
+        setCafeinfo({
+          cafename: cafename || "Cafe Placeholder",
+          phoneNo: phoneNo || "9876543210",
+          address: address || "123 Main Street, Ujjain",
+          description:
+            description || "A cozy spot for great coffee and snacks.",
+          logo: logo || "",
+        });
+      } catch (err) {
+        console.error("Error fetching cafe data:", err.message);
+        // Do not clear state so dummy values remain visible
+      }
+    };
+
+    fetchCafe();
+  }, []);
+
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="min-h-screen bg-background">

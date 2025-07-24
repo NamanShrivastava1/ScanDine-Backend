@@ -22,6 +22,8 @@ router.post("/cafeinfo", [
         .withMessage("Contact number must be between 10 and 15 digits"),
 ], userMiddleware.authenticateUser, cafeController.cafeInfo)
 
+router.get("/showCafe", userMiddleware.authenticateUser, cafeController.showCafeInfo);
+
 router.post("/menu", [
     body("dishName")
         .notEmpty()
