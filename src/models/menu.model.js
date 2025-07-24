@@ -10,7 +10,10 @@ const menuSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        enum: ["Starters", "Main Course", "Dessert", "Drinks", "Snacks", "Breakfast", "Coffee & Tea", "Beverages",],
+        enum: [
+            "Starters", "Main Course", "Dessert", "Drinks", "Snacks",
+            "Breakfast", "Coffee & Tea", "Beverages"
+        ],
     },
     description: {
         type: String,
@@ -19,13 +22,17 @@ const menuSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
-    },  
-    cafe:{
+    },
+    isChefSpecial: {
+        type: Boolean,
+        default: false,
+    },
+    cafe: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "cafe",
         required: true,
     }
-})
+});
 
 const menu = mongoose.model("menu", menuSchema, "menus");
 module.exports = menu;

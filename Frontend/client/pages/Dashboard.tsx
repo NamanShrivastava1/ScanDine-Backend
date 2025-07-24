@@ -56,10 +56,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-
   const [menuItems, setMenuItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -69,14 +68,14 @@ export default function Dashboard() {
     category: "",
     description: "",
     price: "",
-    popular: false,
+    isChefSpecial: false,
   });
   const [editFormData, setEditFormData] = useState({
     dishName: "",
     category: "",
     description: "",
     price: "",
-    popular: false,
+    isChefSpecial: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -163,22 +162,22 @@ export default function Dashboard() {
     }
   };
 
-  const handlePopularToggle = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, popular: checked }));
+  const handleChefSpecialToggle = (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, isChefSpecial: checked }));
   };
 
-  const handleEditPopularToggle = (checked: boolean) => {
-    setEditFormData((prev) => ({ ...prev, popular: checked }));
+  const handleEditChefSpecialToggle = (checked: boolean) => {
+    setEditFormData((prev) => ({ ...prev, isChefSpecial: checked }));
   };
 
   const openEditModal = (item: any) => {
-    setSelectedItem(item);
+    setSelectedItem({ ...item, id: item._id });
     setEditFormData({
-      dishName: item.name,
+      dishName: item.dishName,
       category: item.category,
       description: item.description,
       price: item.price.toString(),
-      popular: item.popular || false,
+      isChefSpecial: item.isChefSpecial || false,
     });
     setErrors({});
     setIsEditModalOpen(true);
@@ -206,7 +205,7 @@ export default function Dashboard() {
           category: formData.category,
           description: formData.description,
           price: numericPrice,
-          popular: formData.popular,
+          isChefSpecial: formData.isChefSpecial,
         },
         {
           withCredentials: true, // Important: includes cookies
@@ -234,10 +233,10 @@ export default function Dashboard() {
     e.preventDefault();
     setErrors({});
 
-    // Validation
     const newErrors: Record<string, string> = {};
 
-    if (!editFormData.dishName.trim()) {
+    // Validate form inputs
+    if (!editFormData.dishName?.trim()) {
       newErrors.dishName = "Dish name is required";
     }
 
@@ -245,7 +244,7 @@ export default function Dashboard() {
       newErrors.category = "Category is required";
     }
 
-    if (!editFormData.price.trim()) {
+    if (!editFormData.price?.toString().trim()) {
       newErrors.price = "Price is required";
     } else if (
       isNaN(Number(editFormData.price)) ||
@@ -259,36 +258,67 @@ export default function Dashboard() {
       return;
     }
 
+    const menuId = selectedItem._id || selectedItem.id;
+    if (!menuId) {
+      alert("⚠️ Menu item ID is missing. Cannot update.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Send PUT request to API
-      const response = await fetch(`/api/menu/${selectedItem.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          name: editFormData.dishName,
-          category: editFormData.category,
-          description: editFormData.description,
-          price: Number(editFormData.price),
-          popular: editFormData.popular,
-        }),
-      });
+      console.log("📤 Submitting Edit Form Data:", editFormData);
 
-      if (response.ok || true) {
-        // Always succeed for demo
-        setIsEditModalOpen(false);
-        alert("Menu item updated successfully!");
-      } else {
-        alert("Failed to update menu item. Please try again.");
+      const payload = {
+        dishName: editFormData.dishName,
+        category: editFormData.category,
+        description: editFormData.description,
+        price: Number(editFormData.price),
+        isChefSpecial: editFormData.isChefSpecial,
+      };
+
+      if (editFormData.isChefSpecial !== undefined) {
+        payload.isChefSpecial = editFormData.isChefSpecial === true;
       }
-    } catch (error) {
-      console.error("Error updating menu item:", error);
-      alert("Menu item updated successfully!");
-      setIsEditModalOpen(false);
+
+      console.log(menuId);
+      const response = await axios.put(
+        `http://localhost:4000/api/dashboard/menu/${selectedItem._id}`,
+        payload,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      console.log("📤 Payload Sent to Backend:", payload);
+
+      // ✅ Success response
+      if (response.status === 200) {
+        const updatedItem = response.data.menu;
+        console.log("✅ Updated Item from Backend:", updatedItem);
+
+        // ✅ Update UI
+        setMenuItems((prevItems) =>
+          prevItems.map((item) =>
+            item._id === updatedItem._id ? updatedItem : item,
+          ),
+        );
+
+        alert("✅ Menu item updated successfully!");
+        setIsEditModalOpen(false);
+      } else {
+        alert("⚠️ Failed to update menu item. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("❌ Error updating menu item:", error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || error.message;
+        alert(`⚠️ Update failed: ${errorMessage}`);
+      } else {
+        alert("⚠️ An unexpected error occurred while updating the menu item");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -300,7 +330,7 @@ export default function Dashboard() {
       category: "",
       description: "",
       price: "",
-      popular: false,
+      isChefSpecial: false,
     });
     setErrors({});
   };
@@ -317,32 +347,23 @@ export default function Dashboard() {
     setIsDeletingItem(true);
 
     try {
-      // Send DELETE request to API
-      const response = await fetch(`/api/menu/${itemToDelete.id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const response = await api.delete(`/menu/${itemToDelete._id}`);
 
-      if (response.ok || true) {
-        // Always succeed for demo
+      if (response.status === 200) {
+        setMenuItems((prevItems) =>
+          prevItems.filter((item) => item._id !== itemToDelete._id),
+        );
         setIsDeleteItemModalOpen(false);
         setItemToDelete(null);
-        alert(`"${itemToDelete.name}" has been deleted successfully!`);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        alert(
-          errorData.message || "Failed to delete menu item. Please try again.",
-        );
+        alert(`"${itemToDelete.dishName}" has been deleted successfully!`);
       }
     } catch (error) {
       console.error("Error deleting menu item:", error);
-      // For demo purposes, still show success
-      setIsDeleteItemModalOpen(false);
-      setItemToDelete(null);
-      alert(`"${itemToDelete.name}" has been deleted successfully!`);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || "Failed to delete menu item");
+      } else {
+        alert("An unexpected error occurred while deleting the menu item");
+      }
     } finally {
       setIsDeletingItem(false);
     }
@@ -435,44 +456,43 @@ export default function Dashboard() {
     }
   };
 
-   const api = axios.create({
-        baseURL: 'http://localhost:4000/api/dashboard',
-        withCredentials: true, // This sends cookies automatically
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+  const api = axios.create({
+    baseURL: "http://localhost:4000/api/dashboard",
+    withCredentials: true, // This sends cookies automatically
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-   useEffect(() => {
-        fetchMenuItems();
-    }, []);
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
 
-    const fetchMenuItems = async () => {
-        try {
-            setLoading(true);
-            
-            // Only fetch menu items, no cafe data needed
-            const menuResponse = await api.get('/my-menu');
-            setMenuItems(menuResponse.data.menuItems || []);
-            console.log(menuResponse.data.menuItems);
-            
-        } catch (error) {
-            console.error('Error fetching menu:', error);
-            
-            if (error.response?.status === 401) {
-                setError('Authentication failed. Please log in again.');
-            } else if (error.response?.status === 404) {
-                setError('No cafe found. Please create a cafe first.');
-            } else {
-                setError(error.response?.data?.message || 'Failed to fetch menu data');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchMenuItems = async () => {
+    try {
+      setLoading(true);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+      // Only fetch menu items, no cafe data needed
+      const menuResponse = await api.get("/my-menu");
+      setMenuItems(menuResponse.data.menuItems || []);
+      console.log(menuResponse.data.menuItems);
+    } catch (error) {
+      console.error("Error fetching menu:", error);
+
+      if (error.response?.status === 401) {
+        setError("Authentication failed. Please log in again.");
+      } else if (error.response?.status === 404) {
+        setError("No cafe found. Please create a cafe first.");
+      } else {
+        setError(error.response?.data?.message || "Failed to fetch menu data");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="min-h-screen bg-background">
@@ -726,19 +746,19 @@ export default function Dashboard() {
                       />
                     </div>
 
-                    {/* Popular Toggle */}
+                    {/* Chef Special Toggle */}
                     <div className="flex items-center justify-between space-x-2 p-3 bg-accent/30 rounded-lg">
                       <div className="space-y-1">
                         <Label className="text-sm font-medium">
                           🌟 Chef Special
                         </Label>
                         <p className="text-xs text-muted-foreground">
-                          Mark this item as popular or chef's recommendation
+                          Mark this item as chef's special recommendation
                         </p>
                       </div>
                       <Switch
-                        checked={formData.popular}
-                        onCheckedChange={handlePopularToggle}
+                        checked={formData.isChefSpecial}
+                        onCheckedChange={handleChefSpecialToggle}
                         className="data-[state=checked]:bg-coral"
                       />
                     </div>
@@ -806,63 +826,71 @@ export default function Dashboard() {
 
             {/* Sample Menu Items */}
             <div className="space-y-4">
-            {menuItems.length === 0 ? (
+              {menuItems.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                    No menu items found. Add your first menu item!
+                  No menu items found. Add your first menu item!
                 </div>
-            ) : (
+              ) : (
                 menuItems.map((item) => (
-                    <Card key={item._id}>
-                        <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 bg-muted rounded-lg"></div>
-                                    <div>
-                                        <h3 className="font-semibold">{item.dishName}</h3>
-                                        <p className="text-sm text-muted-foreground">
-                                            {item.description || 'No description available'}
-                                        </p>
-                                        <p className="font-semibold text-primary">${item.price}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            openEditModal({
-                                                _id: item._id,
-                                                dishName: item.dishName,
-                                                category: item.category,
-                                                description: item.description,
-                                                price: item.price,
-                                            })
-                                        }
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            openDeleteModal({
-                                                _id: item._id,
-                                                dishName: item.dishName,
-                                                category: item.category,
-                                                description: item.description,
-                                                price: item.price,
-                                            })
-                                        }
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                  <Card key={item._id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 bg-muted rounded-lg"></div>
+                          <div>
+                            <h3 className="font-semibold">{item.dishName}</h3>
+                            {item.isChefSpecial && (
+                              <span className="text-[10px] mt-2 mb-2 text-white bg-yellow-500 py-1 px-2 rounded-md">
+                                Chef's Special
+                              </span>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              {item.description || "No description available"}
+                            </p>
+                            <p className="font-semibold text-primary">
+                              ${item.price}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              openEditModal({
+                                _id: item._id,
+                                dishName: item.dishName,
+                                category: item.category,
+                                description: item.description,
+                                price: item.price,
+                                isChefSpecial: item.isChefSpecial,
+                              })
+                            }
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              openDeleteModal({
+                                _id: item._id,
+                                dishName: item.dishName,
+                                category: item.category,
+                                description: item.description,
+                                price: item.price,
+                              })
+                            }
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))
-            )}
-        </div>
+              )}
+            </div>
             {/* Edit Item Modal */}
             <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
               <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-card border-border shadow-lg transition-colors duration-300">
@@ -889,7 +917,7 @@ export default function Dashboard() {
                       name="dishName"
                       type="text"
                       placeholder="e.g., Cappuccino, Caesar Salad"
-                      value={editFormData.dishName}
+                      value={editFormData.dishName || ""}
                       onChange={handleEditInputChange}
                       className={`h-10 bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110 ${
                         errors.dishName ? "border-destructive" : ""
@@ -911,7 +939,7 @@ export default function Dashboard() {
                       Category *
                     </Label>
                     <Select
-                      value={editFormData.category}
+                      value={editFormData.category || ""}
                       onValueChange={handleEditCategoryChange}
                     >
                       <SelectTrigger
@@ -952,7 +980,7 @@ export default function Dashboard() {
                       id="editDescription"
                       name="description"
                       placeholder="Describe your dish..."
-                      value={editFormData.description}
+                      value={editFormData.description || ""}
                       onChange={handleEditInputChange}
                       className="min-h-[80px] resize-none bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110"
                     />
@@ -969,8 +997,8 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <Switch
-                      checked={editFormData.popular}
-                      onCheckedChange={handleEditPopularToggle}
+                      checked={editFormData.isChefSpecial}
+                      onCheckedChange={handleEditChefSpecialToggle}
                       className="data-[state=checked]:bg-coral transition-colors duration-300"
                     />
                   </div>
@@ -994,7 +1022,7 @@ export default function Dashboard() {
                         step="0.01"
                         min="0"
                         placeholder="0.00"
-                        value={editFormData.price}
+                        value={editFormData.price || ""}
                         onChange={handleEditInputChange}
                         className={`h-10 pl-8 bg-background border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300 hover:brightness-110 ${
                           errors.price ? "border-destructive" : ""
