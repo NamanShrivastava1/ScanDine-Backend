@@ -26,6 +26,13 @@ module.exports.registerUser = async (req, res) => {
                 message: "User already exists"
             });
         }
+        
+        const isMobileTaken = await userModel.findOne({ mobile });
+        if (isMobileTaken) {
+            return res.status(400).json({
+                message: "Mobile number is already in use. Please enter a different number.",
+            });
+        }
 
         const hashedPassword = await userModel.hashPassword(password);
 

@@ -17,7 +17,6 @@ import { response } from "express";
 import { set } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
-
 export default function SignUp() {
   const [formData, setFormData] = useState({
     fullname: "",
@@ -58,9 +57,20 @@ export default function SignUp() {
         confirmPassword: "",
       });
 
-      navigate("/signin")
+      setIsSubmitting(false);
+      alert("Account created successfully! Welcome to MenuQR!");
+      navigate("/signin");
     } catch (error) {
       console.log("Error during registration:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "Something went wrong during registration.";
+
+      // Set it into a state to show in UI
+      setErrors((prev) => ({ ...prev, backend: message }));
+
+      alert("An error occurred during registration. Please try again later.");
     }
     // Basic validation
     const newErrors: Record<string, string> = {};
@@ -100,9 +110,6 @@ export default function SignUp() {
 
     // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsSubmitting(false);
-    alert("Account created successfully! Welcome to MenuQR!");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -304,6 +311,11 @@ export default function SignUp() {
                 </Link>
               </p>
             </div>
+            {errors.backend && (
+              <div className="bg-destructive/10 text-destructive border border-destructive/50 p-3 rounded-md text-sm mb-4">
+                {errors.backend}
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

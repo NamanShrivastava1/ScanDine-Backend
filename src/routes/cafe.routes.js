@@ -49,5 +49,7 @@ router.delete("/menu/:menuItemId", cafeMiddleware.authenticateCafe, cafeControll
 
 router.get("/generate-qr", cafeMiddleware.authenticateCafe, cafeController.generateQRCode);
 
+router.get("/public-cafes", cafeController.publicCafeController)
+
 
 module.exports = router;

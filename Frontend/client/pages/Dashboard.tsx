@@ -218,6 +218,7 @@ export default function Dashboard() {
       );
 
       alert("Menu item added successfully!");
+      setIsAddModalOpen(false);
       // You can reset form or fetch menu again here
     } catch (error) {
       // Handle backend validation errors
@@ -499,7 +500,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchCafe = async () => {
       try {
-        const res = await axios.get("/api/dashboard/showCafe", {
+        const res = await axios.get("http://localhost:4000/api/dashboard/showCafe", {
           withCredentials: true,
         });
 
@@ -566,48 +567,48 @@ export default function Dashboard() {
       </div>
     );
 
-  if (error)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-50 p-6">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 100 }}
-          className="bg-white shadow-xl rounded-3xl p-10 max-w-lg w-full text-center"
-        >
-          <motion.div
-            animate={{ rotate: [0, -20, 20, -10, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 3 }}
-            className="flex justify-center"
-          >
-            <Wrench className="text-red-500 w-14 h-14" />
-          </motion.div>
-          <h1 className="text-3xl font-bold text-gray-800 mt-4">
-            Oops, something broke!
-          </h1>
-          <p className="text-gray-600 mt-3">{error}</p>
+  // if (error)
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-50 p-6">
+  //       <motion.div
+  //         initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
+  //         animate={{ scale: 1, opacity: 1, rotate: 0 }}
+  //         transition={{ type: "spring", stiffness: 100 }}
+  //         className="bg-white shadow-xl rounded-3xl p-10 max-w-lg w-full text-center"
+  //       >
+  //         <motion.div
+  //           animate={{ rotate: [0, -20, 20, -10, 10, 0] }}
+  //           transition={{ repeat: Infinity, duration: 3 }}
+  //           className="flex justify-center"
+  //         >
+  //           <Wrench className="text-red-500 w-14 h-14" />
+  //         </motion.div>
+  //         <h1 className="text-3xl font-bold text-gray-800 mt-4">
+  //           Oops, something broke!
+  //         </h1>
+  //         <p className="text-gray-600 mt-3">{error}</p>
 
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-6"
-          >
-            <Link
-              to="/"
-              className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
-            >
-              Take Me Home
-            </Link>
-            <Link
-              to="/signin"
-              className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition ml-3"
-            >
-              Login
-            </Link>
-          </motion.div>
-        </motion.div>
-      </div>
-    );
+  //         <motion.div
+  //           whileHover={{ scale: 1.05 }}
+  //           whileTap={{ scale: 0.95 }}
+  //           className="mt-6"
+  //         >
+  //           <Link
+  //             to="/"
+  //             className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+  //           >
+  //             Take Me Home
+  //           </Link>
+  //           <Link
+  //             to="/signin"
+  //             className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition ml-3"
+  //           >
+  //             Login
+  //           </Link>
+  //         </motion.div>
+  //       </motion.div>
+  //     </div>
+    // );
 
   return (
     <div className="min-h-screen bg-background">

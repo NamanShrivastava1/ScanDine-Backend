@@ -46,9 +46,9 @@ module.exports.showCafeInfo = async (req, res) => {
 
         const cafe = await cafeModel.findOne({ user: userId });
 
-        if (!cafe) {
-            return res.status(404).json({ message: "Cafe not found" });
-        }
+        // if (!cafe) {
+        //     return res.status(404).json({ message: "Cafe not found" });
+        // }
 
         res.status(200).json({
             message: "Cafe info fetched",
@@ -250,5 +250,16 @@ module.exports.getMyMenuItems = async (req, res) => {
             message: "Internal server error",
             error: error.message
         });
+    }
+};
+
+// Public cafe routes
+module.exports.publicCafeController = async (req, res) => {
+    try {
+        const cafes = await cafeModel.find().select("cafename address description");
+        res.status(200).json({ cafes });
+    } catch (error) {
+        console.error("Error fetching public cafes:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
