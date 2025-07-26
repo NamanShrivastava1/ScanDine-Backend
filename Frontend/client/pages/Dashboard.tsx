@@ -217,6 +217,7 @@ export default function Dashboard() {
         },
       );
 
+      fetchMenuItems();
       alert("Menu item added successfully!");
       setIsAddModalOpen(false);
       // You can reset form or fetch menu again here
@@ -299,6 +300,7 @@ export default function Dashboard() {
         },
       );
       console.log("📤 Payload Sent to Backend:", payload);
+      fetchMenuItems();
 
       // ✅ Success response
       if (response.status === 200) {
@@ -451,6 +453,8 @@ export default function Dashboard() {
           withCredentials: true, // ✅ REQUIRED for sending cookies
         },
       );
+
+      alert("Café information updated successfully!");
 
       // Optional: show success message or update UI
       console.log("Cafe added:", response.data);

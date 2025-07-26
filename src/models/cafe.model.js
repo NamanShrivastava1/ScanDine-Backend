@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const menuModel = require("./menu.model.js");
 
 const cafeSchema = new mongoose.Schema({
     cafename: {
@@ -31,6 +32,15 @@ const cafeSchema = new mongoose.Schema({
         required: true,
     }
 })
+
+cafeSchema.pre('findOneAndDelete', async function (next) {
+  const cafe = await this.model.findOne(this.getFilter());
+  if (!cafe) return next();
+
+  await menuModel.deleteMany({ cafe: cafe._id });
+
+  next();
+});
 
 const cafe = mongoose.model("cafe", cafeSchema, "cafes");
 module.exports = cafe;

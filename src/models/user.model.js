@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cafeModel = require("./cafe.model.js"); 
+const menuModel = require("./menu.model.js");
 
 const userSchema = new mongoose.Schema({
     fullname: {
@@ -46,6 +48,24 @@ userSchema.methods.comparePassword = async function (password) {
 userSchema.statics.hashPassword = async function (password) {
     return await bcrypt.hash(password, 10);
 }
+
+userSchema.pre('findOneAndDelete', async function (next) {
+    const user = await this.model.findOne(this.getFilter());
+    if (!user) return next();
+
+    // Delete all cafes belonging to this user
+    const cafes = await cafeModel.find({ user: user._id });
+
+    for (const cafe of cafes) {
+        // Delete menu items for each cafe
+        await menuModel.deleteMany({ cafe: cafe._id });
+    }
+
+    // Delete all cafes after deleting their menus
+    await cafeModel.deleteMany({ user: user._id });
+
+    next();
+});
 
 const user = mongoose.model("user", userSchema);
 
