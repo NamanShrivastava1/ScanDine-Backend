@@ -389,7 +389,7 @@ export default function Dashboard() {
         },
       );
 
-      if (response.data.status === 200) {
+      if (response.status === 200) {
         alert("Your account has been deleted successfully!");
         navigate("/");
       } else {
