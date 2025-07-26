@@ -36,43 +36,7 @@ export default function SignUp() {
     e.preventDefault();
     setErrors({});
 
-    try {
-      const response = await axios.post(
-        "http://localhost:4000/api/users/register",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      console.log(response.data);
-
-      setFormData({
-        fullname: "",
-        email: "",
-        mobile: "",
-        password: "",
-        confirmPassword: "",
-      });
-
-      setIsSubmitting(false);
-      alert("Account created successfully! Welcome to MenuQR!");
-      navigate("/signin");
-    } catch (error) {
-      console.log("Error during registration:", error);
-
-      const message =
-        error.response?.data?.message ||
-        "Something went wrong during registration.";
-
-      // Set it into a state to show in UI
-      setErrors((prev) => ({ ...prev, backend: message }));
-
-      alert("An error occurred during registration. Please try again later.");
-    }
-    // Basic validation
+    // ✅ 1. Run validation first
     const newErrors: Record<string, string> = {};
 
     if (!formData.fullname.trim()) {
@@ -103,13 +67,49 @@ export default function SignUp() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return;
+      return; // ⛔ prevent request if there are validation errors
     }
 
+    // ✅ 2. If validation passed, now show spinner
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/users/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+
+      console.log(response.data);
+
+      setFormData({
+        fullname: "",
+        email: "",
+        mobile: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      alert("Account created successfully! Welcome to MenuQR!");
+      navigate("/signin");
+    } catch (error: any) {
+      console.log("Error during registration:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        "Something went wrong during registration.";
+
+      setErrors((prev) => ({ ...prev, backend: message }));
+      alert("An error occurred during registration. Please try again later.");
+    } finally {
+      // ✅ Always stop the spinner
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -283,6 +283,12 @@ export default function SignUp() {
               )}
             </div>
 
+            {errors.backend && (
+              <div className="bg-destructive/10 text-destructive border border-destructive/50 p-3 rounded-md text-sm mb-4">
+                {errors.backend}
+              </div>
+            )}
+
             {/* Submit Button */}
             <Button
               type="submit"
@@ -311,11 +317,6 @@ export default function SignUp() {
                 </Link>
               </p>
             </div>
-            {errors.backend && (
-              <div className="bg-destructive/10 text-destructive border border-destructive/50 p-3 rounded-md text-sm mb-4">
-                {errors.backend}
-              </div>
-            )}
           </form>
         </CardContent>
       </Card>

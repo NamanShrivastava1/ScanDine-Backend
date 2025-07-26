@@ -62,6 +62,7 @@ export default function Dashboard() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -438,7 +439,7 @@ export default function Dashboard() {
     };
 
     getUserProfile();
-  }, [formData]);
+  }, []);
 
   const cafeInfoHandler = async () => {
     console.log("Sending cafe info:", cafeinfo);
@@ -504,9 +505,12 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchCafe = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/dashboard/showCafe", {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          "http://localhost:4000/api/dashboard/showCafe",
+          {
+            withCredentials: true,
+          },
+        );
 
         const { cafename, phoneNo, address, description, logo } = res.data.cafe;
 
@@ -526,6 +530,69 @@ export default function Dashboard() {
 
     fetchCafe();
   }, []);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        await axios.get("http://localhost:4000/api/users/me", {
+          withCredentials: true,
+        });
+        setIsAuthenticated(true);
+      } catch (error) {
+        setError(
+          "You are not logged in. Please log in to access the Dashboard.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, []);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-50 p-6">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 100 }}
+          className="bg-white shadow-xl rounded-3xl p-10 max-w-lg w-full text-center"
+        >
+          <motion.div
+            animate={{ rotate: [0, -20, 20, -10, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+            className="flex justify-center"
+          >
+            <Wrench className="text-red-500 w-14 h-14" />
+          </motion.div>
+          <h1 className="text-3xl font-bold text-gray-800 mt-4">
+            Oops, something broke!
+          </h1>
+          <p className="text-gray-600 mt-3">{error}</p>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-6"
+          >
+            <Link
+              to="/"
+              className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+            >
+              Take Me Home
+            </Link>
+            <Link
+              to="/signin"
+              className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition ml-3"
+            >
+              Login
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (loading)
     return (
@@ -570,49 +637,6 @@ export default function Dashboard() {
         </div>
       </div>
     );
-
-  // if (error)
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-50 p-6">
-  //       <motion.div
-  //         initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
-  //         animate={{ scale: 1, opacity: 1, rotate: 0 }}
-  //         transition={{ type: "spring", stiffness: 100 }}
-  //         className="bg-white shadow-xl rounded-3xl p-10 max-w-lg w-full text-center"
-  //       >
-  //         <motion.div
-  //           animate={{ rotate: [0, -20, 20, -10, 10, 0] }}
-  //           transition={{ repeat: Infinity, duration: 3 }}
-  //           className="flex justify-center"
-  //         >
-  //           <Wrench className="text-red-500 w-14 h-14" />
-  //         </motion.div>
-  //         <h1 className="text-3xl font-bold text-gray-800 mt-4">
-  //           Oops, something broke!
-  //         </h1>
-  //         <p className="text-gray-600 mt-3">{error}</p>
-
-  //         <motion.div
-  //           whileHover={{ scale: 1.05 }}
-  //           whileTap={{ scale: 0.95 }}
-  //           className="mt-6"
-  //         >
-  //           <Link
-  //             to="/"
-  //             className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
-  //           >
-  //             Take Me Home
-  //           </Link>
-  //           <Link
-  //             to="/signin"
-  //             className="inline-block px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition ml-3"
-  //           >
-  //             Login
-  //           </Link>
-  //         </motion.div>
-  //       </motion.div>
-  //     </div>
-    // );
 
   return (
     <div className="min-h-screen bg-background">
