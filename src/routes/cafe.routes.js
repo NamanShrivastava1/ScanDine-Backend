@@ -51,5 +51,7 @@ router.get("/generate-qr", cafeMiddleware.authenticateCafe, cafeController.gener
 
 router.get("/public-cafes", cafeController.publicCafeController)
 
+router.get("/public-menu/:cafeId", cafeController.publicMenuController);
+
 
 module.exports = router;

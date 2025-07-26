@@ -94,7 +94,7 @@ export default function Search() {
                         </CardTitle>
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span>4.8</span>{" "}
+                          <span>Not Rated</span>{" "}
                           {/* Replace with real rating if available */}
                         </div>
                       </div>

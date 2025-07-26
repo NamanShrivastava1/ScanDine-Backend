@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,102 +9,89 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Coffee, Star, Clock, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Coffee, MapPin } from "lucide-react";
 
-// Mock data for the café menu
-const cafeData = {
-  name: "The Daily Grind",
-  address: "123 Main Street, Anytown",
-  rating: 4.8,
-  hours: "7:00 AM - 6:00 PM",
-  logo: "/placeholder.svg",
-  description: "Artisanal coffee and fresh pastries in the heart of downtown",
+type MenuItem = {
+  _id: string;
+  dishName: string;
+  description: string;
+  price: number;
+  image?: string;
 };
 
-const menuCategories = [
-  {
-    name: "Coffee & Espresso",
-    items: [
-      {
-        id: 1,
-        name: "Cappuccino",
-        price: 4.5,
-        description: "Espresso, steamed milk, and a touch of foam",
-        image: "/placeholder.svg",
-        popular: true,
-      },
-      {
-        id: 2,
-        name: "Macchiato",
-        price: 3.75,
-        description: "Espresso with a dollop of foamed milk",
-        image: "/placeholder.svg",
-      },
-      {
-        id: 3,
-        name: "Americano",
-        price: 3.0,
-        description: "Espresso and hot water",
-        image: "/placeholder.svg",
-      },
-      {
-        id: 4,
-        name: "Latte",
-        price: 4.0,
-        description: "Espresso with steamed milk",
-        image: "/placeholder.svg",
-      },
-    ],
-  },
-  {
-    name: "Specialty Drinks",
-    items: [
-      {
-        id: 5,
-        name: "Iced Matcha Latte",
-        price: 5.25,
-        description: "Premium matcha powder with steamed milk over ice",
-        image: "/placeholder.svg",
-        popular: true,
-      },
-      {
-        id: 6,
-        name: "Caramel Macchiato",
-        price: 5.5,
-        description:
-          "Vanilla syrup, steamed milk, espresso, and caramel drizzle",
-        image: "/placeholder.svg",
-      },
-    ],
-  },
-  {
-    name: "Pastries & Snacks",
-    items: [
-      {
-        id: 7,
-        name: "Croissant",
-        price: 2.75,
-        description: "Buttery, flaky pastry baked fresh daily",
-        image: "/placeholder.svg",
-      },
-      {
-        id: 8,
-        name: "Blueberry Muffin",
-        price: 3.25,
-        description: "Fresh blueberries in a tender, sweet muffin",
-        image: "/placeholder.svg",
-        popular: true,
-      },
-    ],
-  },
-];
+type MenuCategory = {
+  category: string;
+  items: MenuItem[];
+};
+
+type Cafe = {
+  _id: string;
+  cafename: string;
+  address: string;
+  description?: string;
+};
 
 export default function MenuDisplay() {
+  const { cafeId } = useParams<{ cafeId: string }>();
+  const [cafeData, setCafeData] = useState<Cafe | null>(null);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCafeAndMenu = async () => {
+      try {
+        const [cafesRes, menuRes] = await Promise.all([
+          axios.get("http://localhost:4000/api/dashboard/public-cafes"),
+          axios.get(
+            `http://localhost:4000/api/dashboard/public-menu/${cafeId}`,
+          ),
+        ]);
+
+        const allCafes = cafesRes.data.cafes;
+        const selectedCafe = allCafes.find((cafe: Cafe) => cafe._id === cafeId);
+
+        setCafeData(selectedCafe || null);
+        setMenuCategories(menuRes.data.categories || []);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setMenuCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (cafeId) fetchCafeAndMenu();
+  }, [cafeId]);
+
+  if (loading || !cafeData)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-muted-foreground">
+        <svg
+          className="animate-spin h-8 w-8 mb-4 text-primary"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8H4z"
+          ></path>
+        </svg>
+        <p className="text-sm">Loading menu...</p>
+      </div>
+    );
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
@@ -121,25 +111,17 @@ export default function MenuDisplay() {
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-foreground">
-                  {cafeData.name}
+                  {cafeData.cafename}
                 </h1>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span>{cafeData.rating}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{cafeData.hours}</span>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {cafeData.address}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Café Info */}
       <section className="container mx-auto px-4 py-6">
         <Card className="border-none shadow-sm bg-card/50">
           <CardContent className="p-6">
@@ -152,38 +134,27 @@ export default function MenuDisplay() {
         </Card>
       </section>
 
-      {/* Menu Categories */}
       <div className="container mx-auto px-4 pb-8">
         {menuCategories.map((category, categoryIndex) => (
           <section key={categoryIndex} className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              {category.name}
+              {category.category}
             </h2>
             <div className="grid gap-4">
               {category.items.map((item) => (
                 <Card
-                  key={item.id}
+                  key={item._id}
                   className="border-none shadow-sm bg-card hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <CardContent className="p-0">
                     <div className="flex gap-4 p-4">
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <CardTitle className="text-lg">
-                              {item.name}
-                            </CardTitle>
-                            {item.popular && (
-                              <Badge
-                                variant="secondary"
-                                className="bg-coral text-coral-foreground text-xs px-2 py-1"
-                              >
-                                Popular
-                              </Badge>
-                            )}
-                          </div>
+                          <CardTitle className="text-lg">
+                            {item.dishName}
+                          </CardTitle>
                           <span className="text-lg font-semibold text-primary">
-                            ${item.price.toFixed(2)}
+                            ₹{item.price.toFixed(2)}
                           </span>
                         </div>
                         <CardDescription className="text-muted-foreground">
@@ -192,8 +163,8 @@ export default function MenuDisplay() {
                       </div>
                       <div className="w-20 h-20 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
                         <img
-                          src={item.image}
-                          alt={item.name}
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.dishName}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -206,7 +177,6 @@ export default function MenuDisplay() {
         ))}
       </div>
 
-      {/* Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4">
         <div className="container mx-auto flex gap-3">
           <Button asChild variant="outline" className="flex-1">

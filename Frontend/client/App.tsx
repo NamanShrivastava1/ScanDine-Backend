@@ -28,7 +28,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/menu" element={<MenuDisplay />} />
+          <Route path="/menu/:cafeId" element={<MenuDisplay />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/qrcode" element={<QRCodePage />} />
           <Route path="/about" element={<About />} />

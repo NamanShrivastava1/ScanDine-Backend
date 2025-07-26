@@ -256,10 +256,41 @@ module.exports.getMyMenuItems = async (req, res) => {
 // Public cafe routes
 module.exports.publicCafeController = async (req, res) => {
     try {
-        const cafes = await cafeModel.find().select("cafename address description");
+        const cafes = await cafeModel.find().select("_id cafename address description");
         res.status(200).json({ cafes });
     } catch (error) {
         console.error("Error fetching public cafes:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+module.exports.publicMenuController = async (req, res) => {
+    try {
+        const { cafeId } = req.params;
+
+        const menuItems = await menuModel.find({ cafe: cafeId });
+
+        if (!menuItems || menuItems.length === 0) {
+            return res.status(404).json({ message: "No menu items found for this cafe" });
+        }
+
+        // Group items by category
+        const categoriesMap = {};
+        menuItems.forEach((item) => {
+            if (!categoriesMap[item.category]) {
+                categoriesMap[item.category] = [];
+            }
+            categoriesMap[item.category].push(item);
+        });
+
+        const categories = Object.entries(categoriesMap).map(([category, items]) => ({
+            category,
+            items,
+        }));
+
+        res.status(200).json({ categories });
+    } catch (error) {
+        console.error("Error fetching public menu:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
