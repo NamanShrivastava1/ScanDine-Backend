@@ -35,14 +35,37 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "cfa01b0f-be8e-438e-82e6-3497e4122265",
+          subject: "New Contact Message from ScanDine",
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          botcheck: "", // Honeypot field
+        }),
+      });
 
-    // Reset form
-    setFormData({ name: "", email: "", message: "" });
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Thank you for your message! We'll get back to you soon.");
+
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        alert("Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Web3Forms error:", error);
+      alert("There was an error sending the form.");
+    }
+
     setIsSubmitting(false);
-
-    alert("Thank you for your message! We'll get back to you soon.");
   };
 
   const handleInputChange = (
