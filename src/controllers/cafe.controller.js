@@ -2,6 +2,7 @@ const cafeModel = require('../models/cafe.model');
 const menuModel = require('../models/menu.model');
 const { validationResult } = require('express-validator');
 const QRCode = require("qrcode");
+const categoryImageMap = require('../utils/categoryImages');
 module.exports.cafeInfo = async (req, res) => {
     try {
         const error = validationResult(req);
@@ -77,11 +78,14 @@ module.exports.addMenuItems = async (req, res) => {
             });
         }
 
+        const image = categoryImageMap[category] || "No Image Available";
+
         const menu = await menuModel.create({
             dishName,
             price,
             category,
             description,
+            image,
             cafe: req.cafe._id
         })
 
@@ -256,7 +260,7 @@ module.exports.getMyMenuItems = async (req, res) => {
 // Public cafe routes
 module.exports.publicCafeController = async (req, res) => {
     try {
-        const cafes = await cafeModel.find().select("_id cafename address description");
+        const cafes = await cafeModel.find().select("_id cafename address description image");
         res.status(200).json({ cafes });
     } catch (error) {
         console.error("Error fetching public cafes:", error);

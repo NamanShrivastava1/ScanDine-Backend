@@ -3,6 +3,7 @@ const app = express()
 
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+const path = require("path")
 const userRoutes = require("./routes/user.routes")
 const cafeRoutes = require("./routes/cafe.routes")
 
@@ -15,7 +16,7 @@ app.use(cors({
     credentials: true,
 }))
 
-
+app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 app.use("/api/users", userRoutes)
 app.use("/api/dashboard", cafeRoutes)
 

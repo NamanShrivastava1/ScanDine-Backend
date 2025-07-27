@@ -34,12 +34,12 @@ const cafeSchema = new mongoose.Schema({
 })
 
 cafeSchema.pre('findOneAndDelete', async function (next) {
-  const cafe = await this.model.findOne(this.getFilter());
-  if (!cafe) return next();
+    const cafe = await this.model.findOne(this.getFilter());
+    if (!cafe) return next();
 
-  await menuModel.deleteMany({ cafe: cafe._id });
+    await menuModel.deleteMany({ cafe: cafe._id });
 
-  next();
+    next();
 });
 
 const cafe = mongoose.model("cafe", cafeSchema, "cafes");

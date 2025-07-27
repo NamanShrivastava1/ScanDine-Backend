@@ -163,7 +163,7 @@ export default function MenuDisplay() {
                       </div>
                       <div className="w-20 h-20 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
                         <img
-                          src={item.image || "/placeholder.svg"}
+                          src={`http://localhost:4000/uploads/menu/${category.category}.jpg`}
                           alt={item.dishName}
                           className="w-full h-full object-cover"
                         />

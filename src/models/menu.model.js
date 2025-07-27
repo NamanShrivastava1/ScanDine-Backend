@@ -27,6 +27,10 @@ const menuSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    image: {
+        type: String,
+        default: "No Image Available",
+    },
     cafe: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "cafe",

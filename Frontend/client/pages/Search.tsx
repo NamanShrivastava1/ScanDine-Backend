@@ -25,6 +25,22 @@ export default function Search() {
     fetchCafes();
   }, []);
 
+  const cafeImages = [
+    "/uploads/cafe1.jpg",
+    "/uploads/cafe2.jpg",
+    "/uploads/cafe3.jpg",
+    "/uploads/cafe4.jpg",
+    "/uploads/cafe5.jpg",
+  ];
+
+  function getImageForCafe(id: string) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash += id.charCodeAt(i);
+    }
+    return cafeImages[hash % cafeImages.length];
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -82,7 +98,7 @@ export default function Search() {
                   <div className="flex gap-4 p-4">
                     <div className="w-20 h-20 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
                       <img
-                        src="/placeholder.svg"
+                        src={getImageForCafe(cafe._id)}
                         alt={cafe.cafename}
                         className="w-full h-full object-cover"
                       />
