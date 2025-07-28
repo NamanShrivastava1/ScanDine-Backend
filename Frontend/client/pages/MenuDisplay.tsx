@@ -17,6 +17,7 @@ type MenuItem = {
   description: string;
   price: number;
   image?: string;
+  isChefSpecial?: boolean;
 };
 
 type MenuCategory = {
@@ -29,7 +30,6 @@ type Cafe = {
   cafename: string;
   address: string;
   description?: string;
-  isChefSpecial?: boolean;
 };
 
 export default function MenuDisplay() {
@@ -161,7 +161,7 @@ export default function MenuDisplay() {
                         <CardDescription className="text-muted-foreground">
                           {item.description}
                         </CardDescription>
-                        {(cafeData as any).hasChefSpecial && (
+                        {item.isChefSpecial && (
                           <span className="text-[10px] mt-2 inline-flex items-center gap-1 text-white bg-yellow-500 py-1 px-2 rounded-md">
                             🍽️ Chef's Special
                           </span>

@@ -980,7 +980,13 @@ export default function Dashboard() {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-muted rounded-lg"></div>
+                          <div className="w-20 h-20 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
+                            <img
+                              src={`http://localhost:4000/uploads/menu/${item.category}.jpg`}
+                              alt={item.dishName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                           <div>
                             <h3 className="font-semibold">{item.dishName}</h3>
                             {item.isChefSpecial && (

@@ -290,7 +290,7 @@ module.exports.publicMenuController = async (req, res) => {
     try {
         const { cafeId } = req.params;
 
-        const menuItems = await menuModel.find({ cafe: cafeId });
+        const menuItems = await menuModel.find({ cafe: cafeId }).select("dishName description price image category isChefSpecial");
 
         if (!menuItems || menuItems.length === 0) {
             return res.status(404).json({ message: "No menu items found for this cafe" });
