@@ -78,7 +78,8 @@ module.exports.addMenuItems = async (req, res) => {
             });
         }
 
-        const image = categoryImageMap[category] || "No Image Available";
+        const image = (typeof categoryImageMap !== "undefined" && categoryImageMap[category]) || "No Image Available";
+
 
         const menu = await menuModel.create({
             dishName,
