@@ -8,6 +8,7 @@ import axios from "axios";
 
 export default function Search() {
   const [cafes, setCafes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchCafes = async () => {
@@ -40,6 +41,13 @@ export default function Search() {
     }
     return cafeImages[hash % cafeImages.length];
   }
+
+  // Filter cafes based on search query
+  const filteredCafes = cafes.filter((cafe) =>
+    (cafe.cafename + " " + cafe.address)
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase()),
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,6 +84,8 @@ export default function Search() {
             <Input
               placeholder="Search by café name or city..."
               className="pl-10 h-12 text-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -84,12 +94,12 @@ export default function Search() {
       {/* Results Section */}
       <section className="container mx-auto px-4 pb-8">
         <div className="grid gap-4 max-w-4xl mx-auto">
-          {cafes.length === 0 ? (
+          {filteredCafes.length === 0 ? (
             <p className="text-center text-muted-foreground text-lg">
               No cafés found.
             </p>
           ) : (
-            cafes.map((cafe) => (
+            filteredCafes.map((cafe) => (
               <Card
                 key={cafe._id}
                 className="border-none shadow-sm bg-card hover:shadow-md transition-shadow cursor-pointer"
@@ -110,8 +120,7 @@ export default function Search() {
                         </CardTitle>
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span>Not Rated</span>{" "}
-                          {/* Replace with real rating if available */}
+                          <span>Not Rated</span>
                         </div>
                       </div>
                       <div className="text-muted-foreground mb-3">

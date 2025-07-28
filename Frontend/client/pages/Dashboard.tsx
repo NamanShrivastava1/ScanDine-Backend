@@ -914,7 +914,7 @@ export default function Dashboard() {
                       </Label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                          $
+                          ₹
                         </span>
                         <Input
                           id="price"
@@ -992,7 +992,7 @@ export default function Dashboard() {
                               {item.description || "No description available"}
                             </p>
                             <p className="font-semibold text-primary">
-                              ${item.price}
+                              ₹{item.price}
                             </p>
                           </div>
                         </div>
@@ -1157,7 +1157,7 @@ export default function Dashboard() {
                     </Label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                        $
+                        ₹
                       </span>
                       <Input
                         id="editPrice"

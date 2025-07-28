@@ -86,6 +86,7 @@ module.exports.addMenuItems = async (req, res) => {
             category,
             description,
             image,
+            isChefSpecial: req.body.isChefSpecial || false,
             cafe: req.cafe._id
         })
 
@@ -260,13 +261,30 @@ module.exports.getMyMenuItems = async (req, res) => {
 // Public cafe routes
 module.exports.publicCafeController = async (req, res) => {
     try {
-        const cafes = await cafeModel.find().select("_id cafename address description image");
-        res.status(200).json({ cafes });
+        const cafes = await cafeModel.find();
+
+        // For each cafe, check if it has any Chef Special menu item
+        const cafesWithSpecialFlag = await Promise.all(
+            cafes.map(async (cafe) => {
+                const hasChefSpecial = await menuModel.exists({
+                    cafe: cafe._id,
+                    isChefSpecial: true,
+                });
+
+                return {
+                    ...cafe.toObject(),
+                    hasChefSpecial: !!hasChefSpecial,
+                };
+            })
+        );
+
+        res.status(200).json({ cafes: cafesWithSpecialFlag });
     } catch (error) {
         console.error("Error fetching public cafes:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 module.exports.publicMenuController = async (req, res) => {
     try {
